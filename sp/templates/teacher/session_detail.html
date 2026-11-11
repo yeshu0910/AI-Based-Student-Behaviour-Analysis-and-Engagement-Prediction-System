@@ -1,0 +1,438 @@
+{% extends "base.html" %}
+
+{% block title %}Session Deep-Dive: {{ session.session_code[:8] }} - AI Lab{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+  <!-- Nav Breadcrumb -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="{{ url_for('teacher.dashboard') }}" class="text-decoration-none small text-muted">
+      <i class="fa-solid fa-arrow-left me-1"></i> Back to Teacher Dashboard
+    </a>
+    <span class="badge bg-light text-muted border">
+      Session Code: <code>{{ session.session_code }}</code>
+    </span>
+  </div>
+
+  <!-- Session Overview & Engagement Prediction Card -->
+  <div class="row g-4 mb-4">
+    <!-- Left: Student & Session Info -->
+    <div class="col-lg-4">
+      <div class="card card-custom p-4 h-100 shadow-sm">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="bg-primary text-white p-3 rounded-circle">
+            <i class="fa-solid fa-user-graduate fs-4"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold text-dark mb-0">{{ session.student.full_name }}</h5>
+            <small class="text-muted">{{ session.student.email }}</small>
+          </div>
+        </div>
+
+        <hr class="my-2 border-light-subtle">
+
+        <div class="d-flex flex-column gap-2 small py-2">
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">Programming Language:</span>
+            <span class="badge bg-primary">{{ session.language|capitalize }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">Session Status:</span>
+            <span class="fw-semibold text-capitalize text-dark">{{ session.status }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">Start Time:</span>
+            <span class="text-dark">{{ session.start_time.strftime('%b %d, %H:%M') }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">Duration:</span>
+            <span class="text-dark">{{ session.get_duration_minutes() }} minutes</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">Camera Consent:</span>
+            <span class="fw-semibold {% if session.camera_consent %}text-success{% else %}text-secondary{% endif %}">
+              {{ 'Consented (Active)' if session.camera_consent else 'Declined by Student' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center & Right: AI Engagement Engine Card -->
+    <div class="col-lg-8">
+      <div class="card card-custom p-4 h-100 shadow-sm border-2 {% if prediction.predicted_category == 'High Engagement' %}border-success{% elif prediction.predicted_category == 'Moderate Engagement' %}border-warning{% else %}border-danger{% endif %}">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+          <div>
+            <span class="badge bg-secondary-subtle text-secondary border px-2 py-1 mb-1">
+              <i class="fa-solid fa-microchip me-1"></i> Multimodal AI Engagement Engine
+            </span>
+            <h4 class="fw-bold text-dark mb-0">Predicted Engagement Level</h4>
+          </div>
+          <div>
+            {% if prediction.predicted_category == 'High Engagement' %}
+              <span class="badge-engagement-high fs-6 px-3 py-2">
+                <i class="fa-solid fa-circle-check me-1"></i> High Engagement ({{ prediction.overall_engagement_score }}%)
+              </span>
+            {% elif prediction.predicted_category == 'Moderate Engagement' %}
+              <span class="badge-engagement-moderate fs-6 px-3 py-2">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i> Moderate Engagement ({{ prediction.overall_engagement_score }}%)
+              </span>
+            {% else %}
+              <span class="badge-engagement-low fs-6 px-3 py-2">
+                <i class="fa-solid fa-circle-xmark me-1"></i> Low Engagement ({{ prediction.overall_engagement_score }}%)
+              </span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- 4 Modality Progress Meters -->
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6 col-md-3">
+            <div class="p-2 border rounded bg-light text-center">
+              <div class="text-muted small fw-semibold">Visual Attention</div>
+              <h5 class="fw-bold mb-1 text-primary">{{ prediction.visual_score }}%</h5>
+              <div class="progress" style="height: 4px;">
+                <div class="progress-bar bg-primary" style="width: {{ prediction.visual_score }}%;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-3">
+            <div class="p-2 border rounded bg-light text-center">
+              <div class="text-muted small fw-semibold">Programming Activity</div>
+              <h5 class="fw-bold mb-1 text-success">{{ prediction.programming_score }}%</h5>
+              <div class="progress" style="height: 4px;">
+                <div class="progress-bar bg-success" style="width: {{ prediction.programming_score }}%;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-3">
+            <div class="p-2 border rounded bg-light text-center">
+              <div class="text-muted small fw-semibold">Alert Checks</div>
+              <h5 class="fw-bold mb-1 text-info">{{ prediction.alert_score }}%</h5>
+              <div class="progress" style="height: 4px;">
+                <div class="progress-bar bg-info" style="width: {{ prediction.alert_score }}%;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-3">
+            <div class="p-2 border rounded bg-light text-center">
+              <div class="text-muted small fw-semibold">Assessment Score</div>
+              <h5 class="fw-bold mb-1 text-warning">{{ prediction.assessment_score }}%</h5>
+              <div class="progress" style="height: 4px;">
+                <div class="progress-bar bg-warning" style="width: {{ prediction.assessment_score }}%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Indicators & Warnings -->
+        {% set summary = prediction.get_summary_dict() %}
+        <div class="bg-light p-3 rounded-3 small">
+          <div class="row">
+            <div class="col-md-7">
+              <div class="fw-bold text-dark mb-1"><i class="fa-solid fa-list-check text-primary me-1"></i> Supporting Indicators:</div>
+              <ul class="mb-0 ps-3 text-secondary">
+                {% for ind in summary.get('indicators', []) %}
+                  <li>{{ ind }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+            <div class="col-md-5 mt-2 mt-md-0 border-start-md">
+              <div class="fw-bold text-dark mb-1"><i class="fa-solid fa-shield-halved text-info me-1"></i> Model Confidence:</div>
+              <div class="text-secondary mb-2">Confidence Metric: <strong>{{ (prediction.confidence * 100)|round(1) }}%</strong></div>
+              {% if summary.get('warnings') %}
+                <div class="text-warning fw-semibold mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i> Data Quality Notes:</div>
+                <ul class="mb-0 ps-3 text-muted">
+                  {% for warn in summary.get('warnings', []) %}
+                    <li>{{ warn }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Eye-Gaze & Screen Area Visual Analytics -->
+  <div class="row g-4 mb-4">
+    <!-- Screen Area Distribution Chart -->
+    <div class="col-lg-4">
+      <div class="card card-custom p-4 h-100 shadow-sm">
+        <h6 class="fw-bold text-dark mb-2">
+          <i class="fa-solid fa-eye text-primary me-2"></i> Screen-Area Attention Breakdown
+        </h6>
+        <p class="text-muted small mb-3">Proportion of active session gaze allocated to workspace regions</p>
+        <div style="height: 220px;" class="d-flex justify-content-center">
+          <canvas id="screenAreaChart"></canvas>
+        </div>
+        <div class="d-flex justify-content-around mt-3 small text-center">
+          <div>
+            <div class="text-muted">Editor</div>
+            <strong class="text-primary">{{ gaze_analytics.editor_pct }}%</strong>
+          </div>
+          <div>
+            <div class="text-muted">Instructions</div>
+            <strong class="text-info">{{ gaze_analytics.instructions_pct }}%</strong>
+          </div>
+          <div>
+            <div class="text-muted">Console</div>
+            <strong class="text-success">{{ gaze_analytics.console_pct }}%</strong>
+          </div>
+          <div>
+            <div class="text-muted">Outside</div>
+            <strong class="text-danger">{{ gaze_analytics.outside_pct }}%</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gaze Coordinate Scatter Plot -->
+    <div class="col-lg-8">
+      <div class="card card-custom p-4 h-100 shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="fw-bold text-dark mb-0">
+            <i class="fa-solid fa-crosshairs text-primary me-2"></i> Normalized Gaze Coordinates & Fixations (X vs Y)
+          </h6>
+          <span class="badge bg-light text-muted border">
+            Face Visibility: {{ gaze_analytics.face_visibility_pct }}% &bull; Avg Fixation: {{ gaze_analytics.avg_fixation_seconds }}s
+          </span>
+        </div>
+        <p class="text-muted small mb-2">Approximate student gaze fixation points across screen normalized coordinates (0.0=Top-Left, 1.0=Bottom-Right)</p>
+        <div style="height: 240px;">
+          <canvas id="gazeScatterChart"></canvas>
+        </div>
+        {% if gaze_analytics.data_quality_warning %}
+          <div class="alert alert-warning py-1 px-2 mt-2 mb-0 small border-0">
+            <i class="fa-solid fa-circle-exclamation me-1"></i> {{ gaze_analytics.data_quality_warning }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- 5 Programming Tasks Submissions & Metrics -->
+  <div class="card card-custom mb-4 shadow-sm">
+    <div class="card-header card-header-custom py-3 d-flex justify-content-between align-items-center">
+      <h6 class="fw-bold mb-0 text-dark">
+        <i class="fa-solid fa-code text-primary me-2"></i> Five Programming Task Attempts & Performance
+      </h6>
+      <span class="badge bg-light text-muted border">
+        Total Edits: {{ activity_summary.total_edits }} &bull; Total Keystrokes: {{ activity_summary.total_keystrokes }}
+      </span>
+    </div>
+    <div class="card-body p-4">
+      <div class="accordion" id="tasksAccordion">
+        {% for att in task_attempts %}
+          <div class="accordion-item mb-2 border rounded">
+            <h2 class="accordion-header" id="heading{{ att.task_number }}">
+              <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ att.task_number }}">
+                <div class="d-flex justify-content-between align-items-center w-100 me-3">
+                  <div>
+                    <span class="badge bg-secondary me-2">Task {{ att.task_number }}</span>
+                    <strong class="text-dark">{{ att.task_title }}</strong>
+                    <span class="text-muted small ms-2">({{ att.task_type }})</span>
+                  </div>
+                  <div class="d-flex gap-3 align-items-center">
+                    <small class="text-muted"><i class="fa-solid fa-clock me-1"></i> {{ att.time_spent_seconds }}s</small>
+                    <small class="text-muted"><i class="fa-solid fa-pen me-1"></i> {{ att.edits_count }} edits</small>
+                    {% if att.is_passed %}
+                      <span class="badge bg-success-subtle text-success border border-success-subtle">Passed</span>
+                    {% else %}
+                      <span class="badge bg-light text-secondary border">Attempted</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </button>
+            </h2>
+            <div id="collapse{{ att.task_number }}" class="accordion-collapse collapse" data-bs-parent="#tasksAccordion">
+              <div class="accordion-body bg-light small">
+                <div class="row">
+                  <div class="col-md-7">
+                    <label class="fw-bold text-dark mb-1">Submitted Code:</label>
+                    <pre class="bg-dark text-light p-3 rounded mb-0 font-monospace"><code>{{ att.code_submitted or 'No code submitted.' }}</code></pre>
+                  </div>
+                  <div class="col-md-5 mt-2 mt-md-0">
+                    <label class="fw-bold text-dark mb-1">Execution / Test Output:</label>
+                    <pre class="bg-white border p-3 rounded text-secondary font-monospace" style="max-height: 160px; overflow-y: auto;"><code>{{ att.execution_output or 'No execution output logged.' }}</code></pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert Checks & Final Assessment Row -->
+  <div class="row g-4 mb-4">
+    <!-- Timed Alert Responses -->
+    <div class="col-lg-6">
+      <div class="card card-custom h-100 p-4 shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="fw-bold text-dark mb-0">
+            <i class="fa-solid fa-bell text-primary me-2"></i> Timed Alert Questions
+          </h6>
+          <span class="badge bg-light text-muted border">
+            Answered: {{ alert_summary.answered_count }}/{{ alert_summary.total_alerts }} &bull; Correct: {{ alert_summary.correct_count }}
+          </span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm table-hover align-middle mb-0 small">
+            <thead class="table-light">
+              <tr>
+                <th>Question</th>
+                <th>Answer</th>
+                <th>Status</th>
+                <th>Response Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if alert_summary.responses %}
+                {% for resp in alert_summary.responses %}
+                  <tr>
+                    <td>{{ resp.alert_question.question_text[:40] }}...</td>
+                    <td><code>{{ resp.student_answer or 'None' }}</code></td>
+                    <td>
+                      {% if resp.status == 'answered' %}
+                        <span class="badge bg-success-subtle text-success border border-success-subtle">Answered</span>
+                      {% elif resp.status == 'submitted_late' %}
+                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Late</span>
+                      {% else %}
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Timed Out</span>
+                      {% endif %}
+                    </td>
+                    <td>{{ resp.response_time_seconds }}s</td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="4" class="text-center py-3 text-muted">No alert checks triggered.</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Final 10 Assessment Review -->
+    <div class="col-lg-6">
+      <div class="card card-custom h-100 p-4 shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="fw-bold text-dark mb-0">
+            <i class="fa-solid fa-square-check text-primary me-2"></i> Final Assessment Score
+          </h6>
+          {% if assessment_details %}
+            <span class="badge bg-primary fs-6 px-3 py-1">
+              {{ assessment_details.score }} / {{ assessment_details.max_score }} ({{ assessment_details.percentage }}%)
+            </span>
+          {% else %}
+            <span class="badge bg-light text-muted border">Pending</span>
+          {% endif %}
+        </div>
+
+        {% if assessment_details %}
+          <div style="max-height: 250px; overflow-y: auto;" class="pe-1">
+            <div class="d-flex flex-column gap-2 small">
+              {% for q in assessment_details.questions_breakdown %}
+                <div class="p-2 border rounded bg-light">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <strong class="text-dark">{{ loop.index }}. {{ q.question }}</strong>
+                    {% if q.is_correct %}
+                      <span class="badge bg-success-subtle text-success border border-success-subtle">Correct</span>
+                    {% else %}
+                      <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Incorrect</span>
+                    {% endif %}
+                  </div>
+                  <div class="text-muted mt-1">
+                    Student: <code>{{ q.student_answer }}</code> &bull; Correct: <code>{{ q.correct_answer }}</code>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% else %}
+          <div class="text-center py-4 text-muted small">
+            Student has not yet completed the final assessment.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // 1. Screen Area Doughnut Chart
+    const screenCtx = document.getElementById('screenAreaChart').getContext('2d');
+    new Chart(screenCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Code Editor', 'Instructions', 'Console', 'Outside Screen', 'Unknown'],
+        datasets: [{
+          data: [
+            {{ gaze_analytics.editor_pct }},
+            {{ gaze_analytics.instructions_pct }},
+            {{ gaze_analytics.console_pct }},
+            {{ gaze_analytics.outside_pct }},
+            {{ gaze_analytics.unknown_pct }}
+          ],
+          backgroundColor: ['#274FE8', '#37CAE0', '#10B981', '#EF4444', '#94A3B8'],
+          borderWidth: 2,
+          borderColor: '#FFFFFF'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom' }
+        },
+        cutout: '60%'
+      }
+    });
+
+    // 2. Gaze Coordinate Scatter Chart
+    const scatterCtx = document.getElementById('gazeScatterChart').getContext('2d');
+    const gazePoints = {{ sampled_gaze|tojson }};
+    const scatterData = gazePoints.map(p => ({ x: p.x, y: p.y }));
+
+    new Chart(scatterCtx, {
+      type: 'scatter',
+      data: {
+        datasets: [{
+          label: 'Gaze Coordinates (X, Y)',
+          data: scatterData,
+          backgroundColor: 'rgba(39, 79, 232, 0.6)',
+          borderColor: '#274FE8',
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            min: 0,
+            max: 1.0,
+            title: { display: true, text: 'Normalized Screen X' }
+          },
+          y: {
+            min: 0,
+            max: 1.0,
+            reverse: true, // Inverted Y so top of screen is 0
+            title: { display: true, text: 'Normalized Screen Y (Inverted)' }
+          }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}
+

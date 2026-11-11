@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Programming Activities Completed - AI Lab{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+      <div class="card card-custom p-4 shadow-sm text-center">
+        <div class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle p-3 mb-3 mx-auto" style="width: 72px; height: 72px;">
+          <i class="fa-solid fa-trophy fs-2"></i>
+        </div>
+        
+        <h3 class="fw-bold text-dark mb-2">All 5 Programming Tasks Completed!</h3>
+        <p class="text-muted small mb-4">
+          Great job! You have submitted solutions for all five laboratory programming activities in {{ session.language|capitalize }}.
+        </p>
+
+        <!-- Tasks Summary List -->
+        <div class="card bg-light border-0 p-3 mb-4 text-start rounded-3">
+          <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-list-check text-primary me-2"></i> Task Attempts Overview</h6>
+          <div class="d-flex flex-column gap-2">
+            {% for att in attempts %}
+              <div class="d-flex justify-content-between align-items-center bg-white p-2 px-3 rounded border">
+                <div>
+                  <span class="badge bg-secondary me-2">Task {{ att.task_number }}</span>
+                  <span class="fw-semibold text-dark small">{{ att.task_title }}</span>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                  <small class="text-muted"><i class="fa-solid fa-clock me-1"></i> {{ att.time_spent_seconds }}s</small>
+                  {% if att.is_passed %}
+                    <span class="badge bg-success-subtle text-success border border-success-subtle">
+                      <i class="fa-solid fa-check me-1"></i> Passed
+                    </span>
+                  {% else %}
+                    <span class="badge bg-info-subtle text-info border border-info-subtle">
+                      Submitted
+                    </span>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="alert alert-warning py-3 text-start small border-0 mb-4">
+          <div class="d-flex gap-2">
+            <i class="fa-solid fa-circle-exclamation text-warning fs-5 mt-1"></i>
+            <div>
+              <strong>Final Step: 10-Question Conceptual Assessment</strong><br>
+              To complete this laboratory session, please complete the final 10 multiple-choice questions covering core programming concepts.
+            </div>
+          </div>
+        </div>
+
+        <a href="{{ url_for('lab.assessment', session_code=session.session_code) }}" class="btn btn-primary-custom py-2 px-4 fs-6 shadow-sm">
+          Proceed to Final 10-Question Assessment <i class="fa-solid fa-arrow-right ms-2"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

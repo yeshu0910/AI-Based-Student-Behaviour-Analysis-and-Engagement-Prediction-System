@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}AI Student Behaviour & Engagement Analysis{% endblock %}</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom py-2">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="{% if current_user.is_authenticated %}{% if current_user.is_teacher %}{{ url_for('teacher.dashboard') }}{% else %}{{ url_for('student.dashboard') }}{% endif %}{% else %}{{ url_for('auth.login') }}{% endif %}">
+        <i class="fa-solid fa-brain-circuit text-info fs-4"></i>
+        <span>AI Lab Engagement</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          {% if current_user.is_authenticated %}
+            {% if current_user.is_student %}
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('student.dashboard') }}"><i class="fa-solid fa-gauge-high me-1"></i> Dashboard</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('student.start_lab') }}"><i class="fa-solid fa-play me-1"></i> Start Lab</a>
+              </li>
+            {% elif current_user.is_teacher %}
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('teacher.dashboard') }}"><i class="fa-solid fa-chart-line me-1"></i> Analytics Dashboard</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('teacher.reports') }}"><i class="fa-solid fa-file-export me-1"></i> Reports & Export</a>
+              </li>
+            {% endif %}
+          {% endif %}
+        </ul>
+
+        <ul class="navbar-nav ms-auto align-items-center">
+          {% if current_user.is_authenticated %}
+            <li class="nav-item me-3">
+              <span class="badge {% if current_user.is_teacher %}bg-primary{% else %}bg-info text-dark{% endif %} px-2 py-1">
+                <i class="fa-solid {% if current_user.is_teacher %}fa-chalkboard-user{% else %}fa-user-graduate{% endif %} me-1"></i>
+                {{ current_user.role|capitalize }}
+              </span>
+              <span class="text-light ms-2 fw-medium">{{ current_user.full_name }}</span>
+            </li>
+            <li class="nav-item">
+              <a class="btn btn-outline-light btn-sm px-3" href="{{ url_for('auth.logout') }}">
+                <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+              </a>
+            </li>
+          {% else %}
+            <li class="nav-item me-2">
+              <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="btn btn-cyan btn-sm px-3" href="{{ url_for('auth.register') }}">Register</a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Flash Messages -->
+  <div class="container mt-3">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show card-custom py-2 px-3 shadow-sm" role="alert">
+            <i class="fa-solid {% if category == 'success' %}fa-circle-check text-success{% elif category == 'danger' %}fa-triangle-exclamation text-danger{% else %}fa-circle-info text-info{% endif %} me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Content Block -->
+  <main class="flex-grow-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6 text-center text-md-start">
+          <span>AI-Based Student Behaviour Analysis & Engagement Prediction System</span>
+        </div>
+        <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
+          <small class="text-secondary">Academic Support & Multimodal Learning Analytics Tool</small>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>
+

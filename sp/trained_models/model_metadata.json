@@ -1,0 +1,84 @@
+{
+  "model_name": "RandomForestClassifier",
+  "n_estimators": 100,
+  "test_accuracy": 1.0,
+  "macro_f1": 1.0,
+  "feature_names": [
+    "face_visibility_pct",
+    "editor_attention_pct",
+    "outside_attention_pct",
+    "avg_fixation_seconds",
+    "edits_count",
+    "keystrokes_count",
+    "tasks_completed",
+    "idle_events_count",
+    "alerts_answered",
+    "alerts_correct",
+    "assessment_score"
+  ],
+  "feature_importances": {
+    "face_visibility_pct": 0.0291,
+    "editor_attention_pct": 0.0948,
+    "outside_attention_pct": 0.135,
+    "avg_fixation_seconds": 0.0475,
+    "edits_count": 0.139,
+    "keystrokes_count": 0.317,
+    "tasks_completed": 0.1132,
+    "idle_events_count": 0.0713,
+    "alerts_answered": 0.0275,
+    "alerts_correct": 0.0079,
+    "assessment_score": 0.0178
+  },
+  "confusion_matrix": [
+    [
+      29,
+      0,
+      0
+    ],
+    [
+      0,
+      44,
+      0
+    ],
+    [
+      0,
+      0,
+      27
+    ]
+  ],
+  "classification_report": {
+    "High Engagement": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 27.0
+    },
+    "Low Engagement": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 29.0
+    },
+    "Moderate Engagement": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 44.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 100.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 100.0
+    }
+  },
+  "training_samples": 400,
+  "test_samples": 100
+}

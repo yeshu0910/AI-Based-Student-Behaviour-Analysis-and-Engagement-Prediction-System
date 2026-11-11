@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account - AI Lab Engagement Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+      <div class="card card-custom p-4 shadow-sm">
+        <div class="text-center mb-4">
+          <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle p-3 mb-2">
+            <i class="fa-solid fa-user-plus text-primary fs-2"></i>
+          </div>
+          <h4 class="fw-bold text-dark">Create Your Account</h4>
+          <p class="text-muted small">Register for the laboratory session system</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.register') }}">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-dark">Full Name</label>
+            <input type="text" name="full_name" class="form-control" placeholder="e.g. John Doe" required autofocus>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold text-dark">Username</label>
+              <input type="text" name="username" class="form-control" placeholder="e.g. jdoe" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold text-dark">Role</label>
+              <select name="role" class="form-select" required>
+                <option value="student" selected>Student</option>
+                <option value="teacher">Teacher / Faculty</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-dark">Academic Email</label>
+            <input type="email" name="email" class="form-control" placeholder="name@lab.edu" required>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label small fw-semibold text-dark">Password</label>
+            <input type="password" name="password" class="form-control" placeholder="Create a secure password" required minlength="6">
+          </div>
+
+          <button type="submit" class="btn btn-primary-custom w-100 py-2">
+            Register Account <i class="fa-solid fa-circle-check ms-1"></i>
+          </button>
+        </form>
+
+        <div class="mt-4 pt-3 border-top text-center small text-muted">
+          Already registered? <a href="{{ url_for('auth.login') }}" class="text-primary fw-semibold text-decoration-none">Sign in here</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

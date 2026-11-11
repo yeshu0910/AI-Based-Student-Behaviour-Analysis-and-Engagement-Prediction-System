@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI-Based Student Behaviour Analysis &amp; Engagement Prediction System</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 16mm 15mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 10.5pt; line-height: 1.5; color: #1f2937; margin: 0;
+  }
+  h1 { font-size: 20pt; color: #1e3a8a; margin: 0 0 4px 0; line-height: 1.2; }
+  h2 {
+    font-size: 14pt; color: #1e3a8a; margin: 22px 0 8px 0;
+    border-bottom: 2px solid #dbeafe; padding-bottom: 4px;
+    page-break-after: avoid;
+  }
+  h3 { font-size: 11.5pt; color: #1e40af; margin: 14px 0 6px 0; page-break-after: avoid; }
+  p { margin: 6px 0; }
+  ul, ol { margin: 6px 0 6px 20px; padding: 0; }
+  li { margin: 3px 0; }
+  code, .mono {
+    font-family: "Consolas", "Courier New", monospace;
+    background: #f1f5f9; color: #0f172a; padding: 1px 4px;
+    border-radius: 3px; font-size: 9pt;
+  }
+  pre {
+    font-family: "Consolas", "Courier New", monospace; font-size: 8.6pt;
+    background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #1e40af;
+    border-radius: 4px; padding: 10px 12px; overflow-x: auto; line-height: 1.35;
+    page-break-inside: avoid; white-space: pre-wrap;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 9.2pt; page-break-inside: avoid; }
+  th { background: #1e40af; color: #fff; text-align: left; padding: 6px 8px; font-weight: 600; }
+  td { border: 1px solid #e2e8f0; padding: 5px 8px; vertical-align: top; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .title-block {
+    border-top: 5px solid #1e40af; border-bottom: 1px solid #e2e8f0;
+    padding: 14px 0 12px 0; margin-bottom: 18px;
+  }
+  .subtitle { color: #475569; font-size: 11pt; margin: 4px 0 0 0; }
+  .meta { color: #64748b; font-size: 9pt; margin-top: 8px; }
+  .note {
+    background: #fffbeb; border: 1px solid #fcd34d; border-left: 4px solid #f59e0b;
+    padding: 9px 12px; border-radius: 4px; margin: 10px 0; font-size: 9.8pt;
+  }
+  .warning {
+    background: #fef2f2; border: 1px solid #fecaca; border-left: 4px solid #dc2626;
+    padding: 9px 12px; border-radius: 4px; margin: 10px 0; font-size: 9.8pt;
+  }
+  .tag {
+    display: inline-block; background: #dbeafe; color: #1e40af;
+    border-radius: 12px; padding: 2px 9px; font-size: 8.5pt; margin: 2px 4px 2px 0;
+  }
+  .avoid-break { page-break-inside: avoid; }
+  .page-break { page-break-before: always; }
+  .toc li { margin: 4px 0; }
+  footer { margin-top: 28px; border-top: 1px solid #e2e8f0; padding-top: 8px;
+           color: #94a3b8; font-size: 8.5pt; }
+</style>
+</head>
+<body>
+
+<div class="title-block">
+  <h1>AI-Based Student Behaviour Analysis &amp; Engagement Prediction System</h1>
+  <p class="subtitle">Complete Project Report</p>
+  <p class="meta">Flask &bull; SQLAlchemy &bull; scikit-learn &bull; OpenCV &mdash; Programming Laboratory Engagement Analytics</p>
+</div>
+
+<h2>1. What It Is</h2>
+<p>
+A <strong>Flask web application</strong> for programming laboratory sessions. It records student behaviour across
+four "modalities" &mdash; <strong>visual</strong> (gaze/webcam), <strong>programming activity</strong>
+(typing, editing, code runs), <strong>timed alert questions</strong>, and a <strong>final MCQ assessment</strong>
+&mdash; then produces an engagement score and classifies each session as
+<strong>High</strong>, <strong>Moderate</strong>, or <strong>Low Engagement</strong>.
+It provides a <strong>Student portal</strong> and a <strong>Teacher analytics portal</strong>.
+</p>
+
+<h2>2. Technology Stack</h2>
+<ul>
+  <li><strong>Backend:</strong> Python, Flask 3, Flask-SQLAlchemy, Flask-Login, Flask-WTF</li>
+  <li><strong>Database:</strong> SQLite (<code>database/app.db</code>) via SQLAlchemy ORM</li>
+  <li><strong>ML / Data:</strong> scikit-learn, pandas, numpy, joblib</li>
+  <li><strong>Computer Vision:</strong> OpenCV (<code>opencv-python</code>)</li>
+  <li><strong>Frontend:</strong> Jinja2 templates, Bootstrap, Font Awesome, Chart.js, vanilla JavaScript</li>
+  <li><strong>Security:</strong> Werkzeug password hashing, CSRF protection, role-based access decorators</li>
+</ul>
+<p>
+<span class="tag">Flask</span><span class="tag">SQLAlchemy</span><span class="tag">scikit-learn</span>
+<span class="tag">OpenCV</span><span class="tag">Bootstrap</span><span class="tag">Chart.js</span>
+</p>
+
+<h2>3. Directory Structure</h2>
+<pre>sp/
+├── app.py                  # Entry point / app factory
+├── config.py               # Config (secret key, DB URI, paths, timeouts)
+├── requirements.txt
+├── test_system.py          # End-to-end unittest suite
+├── README.md
+├── database/
+│   ├── db.py               # db + login_manager instances
+│   ├── models.py           # All ORM tables
+│   └── app.db              # SQLite DB (seeded)
+├── modules/
+│   ├── auth.py             # Login / logout / register + role decorators
+│   ├── student_routes.py   # Student dashboard / start lab / result
+│   ├── lab_routes.py       # Core lab flow, telemetry, alerts, assessment
+│   ├── teacher_routes.py   # Dashboard, session detail, reports, CSV export
+│   ├── lab_tasks.py        # The 5 tasks for Python and C
+│   ├── code_executor.py    # Sandboxed Python/C execution via subprocess
+│   ├── activity_tracker.py # Records edits / keystrokes / runs / idle
+│   ├── alert_system.py     # Timed alert questions
+│   ├── assessment.py       # Final 10-question grading
+│   ├── gaze_estimation.py  # Maps gaze coords → screen regions + analytics
+│   ├── webcam.py           # OpenCV face detection from base64 frames (UNUSED)
+│   ├── facial_features.py  # Head-pose math helpers (UNUSED)
+│   ├── feature_extraction.py   # Aggregates all features for prediction
+│   ├── engagement_predictor.py # Scoring + classification
+│   └── seeder.py           # Seeds users, questions, demo sessions
+├── training/
+│   ├── train_engagement_model.py  # Trains Random Forest on synthetic data
+│   ├── evaluate_model.py          # Evaluation report
+│   └── dataset_preprocessing.py   # Missing-value imputation
+├── trained_models/
+│   ├── engagement_model.pkl
+│   └── model_metadata.json
+├── datasets/
+│   ├── custom_lab_data/session_features.csv
+│   ├── custom_lab_data/session_labels.csv
+│   ├── raw/ (empty)
+│   └── processed/ (empty)
+├── records/ (empty)
+├── static/{css,js,images}
+└── templates/{auth,student,teacher}/ + base.html, home.html</pre>
+
+<h2>4. Roles &amp; Seeded Credentials</h2>
+<table>
+  <thead><tr><th>Role</th><th>Username</th><th>Password</th><th>Full Name</th></tr></thead>
+  <tbody>
+    <tr><td>Teacher</td><td>teacher</td><td>admin123</td><td>Dr. Sunita Rao</td></tr>
+    <tr><td>Student</td><td>student1</td><td>student123</td><td>Aarav Sharma</td></tr>
+    <tr><td>Student</td><td>student2</td><td>student123</td><td>Priya Patel</td></tr>
+    <tr><td>Student</td><td>student3</td><td>student123</td><td>Rahul Verma</td></tr>
+    <tr><td>Student</td><td>student4</td><td>student123</td><td>Ananya Gupta</td></tr>
+  </tbody>
+</table>
+<p>Registration is also open at <code>/auth/register</code>, where the user can self-select student or teacher role.</p>
+
+<h2>5. Complete User Flow</h2>
+
+<h3>Student</h3>
+<ol>
+  <li><code>/student/dashboard</code> &mdash; shows past sessions and a "start new lab" action.</li>
+  <li><code>/student/start</code> &mdash; chooses <strong>Python or C</strong> and gives <strong>camera consent</strong>; creates a <code>LabSession</code> plus 5 <code>LabTaskAttempt</code> rows.</li>
+  <li><code>/lab/&lt;session_code&gt;</code> &mdash; workspace with the 5 tasks: write-from-scratch, arrange jumbled code, fill-in-the-blank, debug, predict output.</li>
+  <li><strong>Run code</strong> via <code>/lab/&lt;code&gt;/run</code> (subprocess execution, 5-second timeout).</li>
+  <li><strong>Submit tasks</strong> via <code>/lab/&lt;code&gt;/submit-task</code>; auto-checked against expected output or correct option.</li>
+  <li><strong>Timed alert questions</strong> fetched via <code>/alert/get</code>, answered via <code>/alert/respond</code> (300-second timeout).</li>
+  <li><strong>Gaze telemetry</strong> posted every 6 seconds to <code>/telemetry/gaze</code>.</li>
+  <li><strong>Activity telemetry</strong> (keystrokes/edits) to <code>/telemetry/event</code>.</li>
+  <li>After all 5 tasks &rarr; tasks-completed &rarr; <strong>10-question MCQ assessment</strong> &rarr; submit.</li>
+  <li>On assessment submit the session is marked <strong>completed</strong>, then <code>EngagementPredictor.predict_session_engagement()</code> runs.</li>
+  <li><code>/student/result/&lt;code&gt;</code> &mdash; simple confirmation; AI scores are hidden from students.</li>
+</ol>
+
+<h3>Teacher</h3>
+<ul>
+  <li><code>/teacher/dashboard</code> &mdash; KPIs (students, sessions, completed, active), engagement doughnut chart, session list.</li>
+  <li><code>/teacher/session/&lt;id&gt;</code> &mdash; per-session deep dive: tasks, code and outputs, activity summary, gaze scatter plot and screen-area breakdown, alert responses, assessment review, prediction scores/confidence/warnings.</li>
+  <li><code>/teacher/student/&lt;id&gt;</code> &mdash; per-student history.</li>
+  <li><code>/teacher/reports</code> &mdash; aggregate engagement counts.</li>
+  <li><code>/teacher/export/csv</code> &mdash; full CSV export of sessions and predictions.</li>
+</ul>
+
+<h2>6. Database Schema</h2>
+<table>
+  <thead><tr><th>Table</th><th>Purpose / Key Fields</th></tr></thead>
+  <tbody>
+    <tr><td><code>users</code></td><td>id, username, email, password_hash, role, full_name</td></tr>
+    <tr><td><code>lab_sessions</code></td><td>student_id, session_code (UUID), language, start/end time, status, camera_consent</td></tr>
+    <tr><td><code>lab_task_attempts</code></td><td>session_id, task_number 1–5, type, code_submitted, output, is_passed, edits, keystrokes, time_spent</td></tr>
+    <tr><td><code>programming_events</code></td><td>session_id, task_number, event_type (edit/keystroke/idle/run_test), details_json</td></tr>
+    <tr><td><code>gaze_observations</code></td><td>session_id, face_detected, head pose, gaze_x/y, screen_area, fixation</td></tr>
+    <tr><td><code>alert_questions</code></td><td>language, task_number, question, 4 options, correct_option</td></tr>
+    <tr><td><code>alert_responses</code></td><td>session_id, alert_id, displayed/responded times, answer, is_correct, status</td></tr>
+    <tr><td><code>assessment_questions</code></td><td>language, question, 4 options, correct_option, topic</td></tr>
+    <tr><td><code>assessment_attempts</code></td><td>session_id (unique), student_id, total_score, max_score, answers_json, status</td></tr>
+    <tr><td><code>engagement_predictions</code></td><td>session_id (unique), four sub-scores, overall score, category, confidence, feature_summary_json</td></tr>
+  </tbody>
+</table>
+<p>Relationships cascade-delete child records when a session is deleted. <code>AssessmentAttempt</code> and <code>EngagementPrediction</code> are one-to-one with a session.</p>
+
+<h2>7. How Engagement Is Computed</h2>
+<p><code>FeatureExtractor.extract_session_features()</code> aggregates four groups of features:</p>
+<ul>
+  <li><strong>Visual:</strong> face visibility %, editor / instructions / console / outside attention %, average fixation (only if more than 5 observations and face detected above 10%).</li>
+  <li><strong>Programming:</strong> edits, keystrokes, tasks completed/passed, task time, idle count, run count.</li>
+  <li><strong>Alerts:</strong> total / answered / timed-out / correct, average response time.</li>
+  <li><strong>Assessment:</strong> score, percentage, completed flag.</li>
+</ul>
+<p>Then <code>EngagementPredictor.predict_session_engagement()</code> computes four 0–100 sub-scores and a weighted fusion:</p>
+<ol>
+  <li><strong>Visual</strong> = editor&times;0.6 + face&times;0.3 &minus; outside&times;0.2 (skipped, not penalised, if camera is missing or declined).</li>
+  <li><strong>Programming</strong> = (tasks/5)&times;50 + min(35, keystrokes/150&times;20 + edits/30&times;15) + min(15, runs&times;5).</li>
+  <li><strong>Alert</strong> = answered_ratio&times;60 + correct_ratio&times;40.</li>
+  <li><strong>Assessment</strong> = assessment percentage.</li>
+</ol>
+<p>
+Weights dynamically renormalise based on available modalities (for example, with visual data present:
+visual 0.25, programming 0.35, alert 0.15, assessment 0.25).
+Classification thresholds: <strong>High &ge; 70</strong>, <strong>Moderate &ge; 42</strong>, otherwise <strong>Low</strong>.
+Confidence = 0.55 + 0.1 &times; active_modalities (capped at 0.98). Results are stored in <code>engagement_predictions</code>.
+</p>
+
+<h2>8. Machine Learning Model &amp; Important Caveat</h2>
+<table>
+  <thead><tr><th>Item</th><th>Detail</th></tr></thead>
+  <tbody>
+    <tr><td>Algorithm</td><td>RandomForestClassifier (100 trees, max_depth = 6, random_state = 42)</td></tr>
+    <tr><td>Training data</td><td>Synthetic — 500 samples generated from hand-set normal distributions per class</td></tr>
+    <tr><td>Split</td><td>80/20 stratified &rarr; 400 train / 100 test</td></tr>
+    <tr><td>Reported metrics</td><td>100% test accuracy, macro F1 = 1.0, perfect confusion matrix</td></tr>
+    <tr><td>Top features</td><td>keystrokes 0.317, edits 0.139, outside-attention 0.135, tasks 0.113, editor-attention 0.095</td></tr>
+  </tbody>
+</table>
+<div class="warning">
+  <strong>Accuracy caveats:</strong>
+  <ul>
+    <li>The 100% score is expected because the synthetic labels are trivially separable from the features; it does <strong>not</strong> reflect real-world accuracy.</li>
+    <li><code>evaluate_model.py</code> re-evaluates on the <strong>full 500 rows including training data</strong> &mdash; a data-leakage problem.</li>
+    <li><strong>The trained model is never used at runtime.</strong> <code>load_model()</code> loads the <code>.pkl</code>, but <code>predict_session_engagement()</code> never calls it. Live predictions are entirely rule-based.</li>
+  </ul>
+</div>
+
+<h2>9. Webcam / Gaze — Real vs Simulated</h2>
+<ul>
+  <li>The browser requests the webcam with consent and draws frames to a canvas every 6 seconds, but <strong>does not send images</strong> — it sends numeric gaze values.</li>
+  <li>Those values are <strong>randomly generated</strong> in JavaScript (<code>Math.random()</code> jitter around x = 0.65, y = 0.40), not actual eye tracking.</li>
+  <li><code>modules/webcam.py</code> (real OpenCV Haar-cascade face detection) and <code>modules/facial_features.py</code> (head-pose math) exist but are <strong>never called</strong>.</li>
+  <li><code>ScreenAreaMapper</code> classifies coordinates into editor / instructions / console / outside / unknown, but only from the simulated coordinates.</li>
+  <li><strong>No video or images are stored</strong> anywhere; <code>datasets/raw</code> and <code>datasets/processed</code> are empty.</li>
+</ul>
+
+<h2>10. Security Features &amp; Weaknesses</h2>
+<h3>Implemented</h3>
+<ul>
+  <li>Passwords hashed with Werkzeug; role-based decorators <code>student_required</code> / <code>teacher_required</code>; login redirect validation.</li>
+  <li>Code executor blocks strings such as <code>os.system</code>, <code>subprocess.</code>, <code>shutil.rmtree</code>; runs in a temp directory with a 5-second timeout.</li>
+</ul>
+<h3>Weaknesses</h3>
+<ul>
+  <li>The string-based sandbox is easily bypassed and is not safe for public or untrusted use.</li>
+  <li><code>SECRET_KEY</code> is hardcoded in <code>config.py</code>; <code>debug=True</code> is used in <code>app.py</code>.</li>
+  <li>No rate limiting; students can self-register as teachers.</li>
+</ul>
+
+<h2>11. Running &amp; Testing</h2>
+<pre>pip install -r requirements.txt
+python app.py                          # http://127.0.0.1:5000
+python test_system.py                  # unittest suite
+python training/train_engagement_model.py
+python training/evaluate_model.py</pre>
+<p><code>test_system.py</code> verifies: seed data, Python execution plus safety filter, gaze-to-area mapping, prediction output range, and CSV export.</p>
+
+<h2>12. Honest Summary of Limitations</h2>
+<ol>
+  <li><strong>Synthetic-only data</strong> — no real DAiSEE / video / student dataset, despite a docstring mention.</li>
+  <li><strong>Simulated gaze</strong> — visual "engagement" is random values, not actual eye tracking.</li>
+  <li><strong>Trained Random Forest is unused</strong> — runtime is rule-based; the 100% accuracy is an artifact of synthetic data and leakage.</li>
+  <li><strong>Not production-ready</strong> — insecure code sandbox, hardcoded secret, debug mode, no HTTPS, no migrations.</li>
+  <li>Some modules (<code>webcam.py</code>, <code>facial_features.py</code>, <code>dataset_preprocessing.py</code>) exist but are unused.</li>
+</ol>
+
+<footer>
+  AI-Based Student Behaviour Analysis &amp; Engagement Prediction System &mdash; Complete Project Report.
+  Generated from the project source code.
+</footer>
+
+</body>
+</html>

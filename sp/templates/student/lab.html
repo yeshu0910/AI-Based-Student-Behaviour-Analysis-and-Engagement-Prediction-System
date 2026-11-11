@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}Lab Workspace: Task {{ current_task_num }} - {{ session.language|capitalize }}{% endblock %}
+
+{% block content %}
+<div class="workspace-container">
+  <!-- Workspace Header Bar -->
+  <div class="bg-white border-bottom px-4 py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <!-- Task Nav Pills -->
+    <div class="d-flex align-items-center gap-2">
+      <span class="fw-bold text-dark small me-2">Tasks:</span>
+      {% for att in attempts %}
+        <a href="{{ url_for('lab.workspace', session_code=session.session_code, task=att.task_number) }}"
+           class="btn btn-sm {% if att.task_number == current_task_num %}btn-primary{% elif att.status == 'completed' %}btn-success text-white{% else %}btn-outline-secondary{% endif %} px-3 rounded-pill fw-semibold">
+          {% if att.status == 'completed' %}<i class="fa-solid fa-check me-1"></i>{% endif %}
+          Task {{ att.task_number }}
+        </a>
+      {% endfor %}
+    </div>
+
+    <!-- Active Counters & Timer -->
+    <div class="d-flex align-items-center gap-3">
+      <span class="badge bg-light text-dark border px-3 py-2 small">
+        <i class="fa-solid fa-clock text-primary me-1"></i> Time: <strong id="task-timer">00:00</strong>
+      </span>
+      <span class="badge bg-light text-muted border px-2 py-2 small" id="keystrokes-badge">
+        <i class="fa-solid fa-keyboard text-secondary me-1"></i> 0 keys
+      </span>
+      <span class="badge bg-light text-muted border px-2 py-2 small" id="edits-badge">
+        <i class="fa-solid fa-pen-to-square text-secondary me-1"></i> 0 edits
+      </span>
+      <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fw-semibold">
+        {{ session.language|capitalize }} Mode
+      </span>
+    </div>
+  </div>
+
+  <!-- Workspace Body (Split Panes) -->
+  <div class="workspace-body">
+    <!-- Left Pane: Problem Spec, Instructions & Questions -->
+    <div class="workspace-left">
+      <div class="mb-3">
+        <span class="badge bg-primary mb-2 text-uppercase">{{ task_spec.type }}</span>
+        <h5 class="fw-bold text-dark">{{ task_spec.title }}</h5>
+      </div>
+
+      <div class="card bg-light border-0 p-3 mb-3 rounded-3">
+        <h6 class="fw-bold text-dark small mb-1"><i class="fa-solid fa-circle-question text-primary me-1"></i> Instructions:</h6>
+        <p class="text-secondary small mb-0">{{ task_spec.instructions }}</p>
+      </div>
+
+      {% if task_spec.type == 'predict' %}
+        <!-- Predict Program Output Interface -->
+        <div class="mb-3">
+          <label class="fw-bold small text-dark mb-1">Code Snippet to Analyze:</label>
+          <pre class="bg-dark text-light p-3 rounded-3 small"><code>{{ task_spec.code_snippet }}</code></pre>
+        </div>
+
+        <div class="mb-3">
+          <label class="fw-bold small text-dark mb-2">Select Predicted Output:</label>
+          <div class="list-group">
+            {% for opt in task_spec.options %}
+              <label class="list-group-item list-group-item-action d-flex align-items-center gap-2 cursor-pointer">
+                <input class="form-check-input flex-shrink-0" type="radio" name="predict_option" value="{{ opt }}" {% if current_attempt.code_submitted == opt %}checked{% endif %}>
+                <span class="font-monospace small">{{ opt }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+      {% elif task_spec.type == 'jumble' %}
+        <div class="mb-3">
+          <label class="fw-bold small text-dark mb-1">Statements to Arrange:</label>
+          <div class="p-2 bg-light border rounded-3 small">
+            <ol class="mb-0 ps-3">
+              {% for line in task_spec.jumbled_lines %}
+                <li class="font-monospace py-1">{{ line }}</li>
+              {% endfor %}
+            </ol>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if task_spec.sample_input %}
+        <div class="mb-3">
+          <label class="fw-bold small text-dark mb-1">Sample Test Input:</label>
+          <pre class="bg-white border p-2 rounded small mb-0"><code>{{ task_spec.sample_input }}</code></pre>
+        </div>
+      {% endif %}
+
+      {% if task_spec.expected_output %}
+        <div class="mb-3">
+          <label class="fw-bold small text-dark mb-1">Expected Output Pattern:</label>
+          <pre class="bg-white border p-2 rounded small text-success mb-0"><code>{{ task_spec.expected_output }}</code></pre>
+        </div>
+      {% endif %}
+
+      {% if task_spec.solution_hint %}
+        <div class="alert alert-info py-2 px-3 small border-0 mt-3">
+          <i class="fa-solid fa-lightbulb text-warning me-1"></i> <strong>Hint:</strong> {{ task_spec.solution_hint }}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Right Pane: Code Editor & Console Output -->
+    <div class="workspace-right">
+      <!-- Editor Toolbar -->
+      <div class="bg-dark px-3 py-2 border-bottom border-secondary d-flex justify-content-between align-items-center">
+        <span class="text-secondary small fw-mono">
+          <i class="fa-solid fa-file-code me-1"></i> solution.{{ 'c' if session.language == 'c' else 'py' }}
+        </span>
+        <div class="d-flex gap-2">
+          {% if task_spec.type != 'predict' %}
+            <button type="button" class="btn btn-outline-light btn-sm" id="btn-run-code">
+              <i class="fa-solid fa-play text-success me-1"></i> Run Code
+            </button>
+          {% endif %}
+          <button type="button" class="btn btn-primary-custom btn-sm px-3" id="btn-submit-task">
+            <i class="fa-solid fa-cloud-arrow-up me-1"></i> Submit Task
+          </button>
+        </div>
+      </div>
+
+      <!-- Editor Area -->
+      <div class="editor-container">
+        <textarea id="code-editor" class="code-editor-area" spellcheck="false" placeholder="Write or edit your code here...">{{ current_attempt.code_submitted or task_spec.starter_code or '' }}</textarea>
+      </div>
+
+      <!-- Console Output Pane -->
+      <div class="terminal-output" id="console-output">
+[Console Ready] Click 'Run Code' to execute test cases or 'Submit Task' when satisfied with your solution.
+{% if current_attempt.execution_output %}
+[Previous Execution Output]:
+{{ current_attempt.execution_output }}
+{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Webcam PiP Status Pill -->
+<div class="webcam-indicator shadow-sm" id="camera-status-pill">
+  <span class="webcam-dot" id="camera-status-dot"></span>
+  <span id="camera-status-text">Visual Attention Active</span>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/activity_tracker.js') }}"></script>
+<script src="{{ url_for('static', filename='js/webcam.js') }}"></script>
+<script src="{{ url_for('static', filename='js/alert.js') }}"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const sessionCode = "{{ session.session_code }}";
+    const currentTaskNum = {{ current_task_num }};
+    const hasCameraConsent = {{ 'true' if session.camera_consent else 'false' }};
+    const taskType = "{{ task_spec.type }}";
+
+    // 1. Initialize Activity Tracker
+    ActivityTracker.init(sessionCode, currentTaskNum);
+
+    // 2. Initialize Consensual Webcam Tracker
+    WebcamTracker.init(sessionCode, hasCameraConsent);
+
+    // 3. Initialize Timed Alert System
+    AlertSystem.init(sessionCode, currentTaskNum);
+
+    const editor = document.getElementById('code-editor');
+    const consoleOutput = document.getElementById('console-output');
+    const runBtn = document.getElementById('btn-run-code');
+    const submitBtn = document.getElementById('btn-submit-task');
+
+    // Run Code Handler
+    if (runBtn) {
+      runBtn.addEventListener('click', function () {
+        consoleOutput.innerText = "[Executing program in secure sandbox... Please wait]";
+        const code = editor.value;
+
+        fetch(`/lab/${sessionCode}/run`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            code: code,
+            task_number: currentTaskNum,
+            input: "{{ task_spec.sample_input or '' }}"
+          })
+        })
+          .then(res => res.json())
+          .then(data => {
+            consoleOutput.innerText = data.output || "Execution finished with no output.";
+          })
+          .catch(err => {
+            consoleOutput.innerText = "[Execution Error]: " + err.message;
+          });
+      });
+    }
+
+    // Submit Task Handler
+    if (submitBtn) {
+      submitBtn.addEventListener('click', function () {
+        let codeSubmission = editor.value;
+
+        if (taskType === 'predict') {
+          const selected = document.querySelector('input[name="predict_option"]:checked');
+          if (!selected) {
+            alert("Please select one of the predicted output options before submitting.");
+            return;
+          }
+          codeSubmission = selected.value;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Submitting...';
+
+        const stats = ActivityTracker.getStats();
+
+        fetch(`/lab/${sessionCode}/submit-task`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            task_number: currentTaskNum,
+            code: codeSubmission,
+            time_spent: stats.timeSpent,
+            edits: stats.edits,
+            keystrokes: stats.keystrokes
+          })
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.all_done) {
+              window.location.href = data.redirect_url;
+            } else if (data.next_task) {
+              window.location.href = `/lab/${sessionCode}?task=${data.next_task}`;
+            } else {
+              window.location.reload();
+            }
+          })
+          .catch(err => {
+            alert("Error submitting task: " + err.message);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up me-1"></i> Submit Task';
+          });
+      });
+    }
+  });
+</script>
+{% endblock %}
+

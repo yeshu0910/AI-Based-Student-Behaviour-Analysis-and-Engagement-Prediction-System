@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}AI Student Behaviour & Engagement Prediction System{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="py-5 text-white" style="background: linear-gradient(135deg, #0B1934 0%, #162a56 100%);">
+  <div class="container text-center py-4">
+    <div class="d-inline-flex align-items-center gap-2 bg-info bg-opacity-10 text-info px-3 py-1 rounded-pill mb-3 small fw-semibold border border-info border-opacity-25">
+      <i class="fa-solid fa-microchip"></i> Multimodal AI Laboratory Analytics
+    </div>
+    <h1 class="fw-bold display-5 mb-3">AI Student Behaviour Analysis & Engagement Prediction</h1>
+    <p class="lead text-light text-opacity-75 max-w-2xl mx-auto mb-4" style="max-width: 720px;">
+      An intelligent academic support platform estimating student engagement in programming laboratory sessions using eye-gaze tracking, code-editing cadence, timed concept checks, and assessment performance.
+    </p>
+
+    <!-- Two Separate Portals Selection -->
+    <div class="row justify-content-center g-4 mt-2 max-w-4xl mx-auto" style="max-width: 860px;">
+      <!-- Student Portal Card -->
+      <div class="col-md-6 text-start">
+        <div class="card h-100 p-4 border-0 shadow-lg text-dark rounded-4" style="background: #FFFFFF;">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="bg-primary text-white rounded-3 p-3">
+              <i class="fa-solid fa-user-graduate fs-3"></i>
+            </div>
+            <div>
+              <h4 class="fw-bold text-dark mb-0">Student Portal</h4>
+              <small class="text-muted">Virtual Programming Laboratory</small>
+            </div>
+          </div>
+          <p class="text-secondary small mb-4">
+            Start or resume Python & C programming activities, test your code in a safe sandbox, answer timed concept checks, and take the final assessment.
+          </p>
+          <div class="mt-auto">
+            <a href="{{ url_for('auth.student_login') }}" class="btn btn-primary-custom w-100 py-2 fs-6 fw-semibold">
+              Enter Student Portal <i class="fa-solid fa-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Teacher Portal Card -->
+      <div class="col-md-6 text-start">
+        <div class="card h-100 p-4 border-0 shadow-lg text-dark rounded-4" style="background: #FFFFFF;">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="bg-dark text-cyan rounded-3 p-3">
+              <i class="fa-solid fa-chalkboard-user fs-3 text-info"></i>
+            </div>
+            <div>
+              <h4 class="fw-bold text-dark mb-0">Teacher Portal</h4>
+              <small class="text-muted">Analytics & Academic Support</small>
+            </div>
+          </div>
+          <p class="text-secondary small mb-4">
+            Inspect live session metrics, gaze-coordinate heatmaps, screen-area attention distributions, AI engagement predictions, and export CSV reports.
+          </p>
+          <div class="mt-auto">
+            <a href="{{ url_for('auth.teacher_login') }}" class="btn btn-outline-dark w-100 py-2 fs-6 fw-semibold">
+              Enter Teacher Portal <i class="fa-solid fa-lock ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Features & Architecture Section -->
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h3 class="fw-bold text-dark">Multimodal Indicators of Student Engagement</h3>
+    <p class="text-muted small">Engagement is evaluated across four synchronized observation dimensions without disciplinary penalties.</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-3">
+      <div class="card card-custom p-4 h-100 text-center">
+        <div class="text-primary fs-2 mb-2"><i class="fa-solid fa-eye"></i></div>
+        <h6 class="fw-bold text-dark">1. Visual & Gaze Focus</h6>
+        <p class="text-muted small mb-0">Consensual webcam estimation of face visibility, head pose, and screen attention (Editor, Instructions, Console).</p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card card-custom p-4 h-100 text-center">
+        <div class="text-success fs-2 mb-2"><i class="fa-solid fa-code"></i></div>
+        <h6 class="fw-bold text-dark">2. Programming Activity</h6>
+        <p class="text-muted small mb-0">Real-time telemetry tracking of typing cadence, edits count, sandbox test runs, and task time allocation.</p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card card-custom p-4 h-100 text-center">
+        <div class="text-info fs-2 mb-2"><i class="fa-solid fa-bell"></i></div>
+        <h6 class="fw-bold text-dark">3. Timed Alert Checks</h6>
+        <p class="text-muted small mb-0">Occasional task-related concept queries with a 5-minute countdown measuring responsiveness.</p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card card-custom p-4 h-100 text-center">
+        <div class="text-warning fs-2 mb-2"><i class="fa-solid fa-square-check"></i></div>
+        <h6 class="fw-bold text-dark">4. Final 10-MCQ Assessment</h6>
+        <p class="text-muted small mb-0">Automatic conceptual grading across fundamentals: variables, loops, arrays, pointers, and debugging.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Credentials Reference Card -->
+  <div class="card card-custom p-4 mt-5 bg-white border">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h6 class="fw-bold text-dark mb-1"><i class="fa-solid fa-key text-primary me-2"></i> Quick Demonstration Credentials</h6>
+        <p class="text-muted small mb-0">
+          <strong>Student Portal:</strong> <code>student1</code> / <code>student123</code> (or <code>student2</code>, <code>student3</code>)<br>
+          <strong>Teacher Portal:</strong> <code>teacher</code> / <code>admin123</code>
+        </p>
+      </div>
+      <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+          <i class="fa-solid fa-circle-check me-1"></i> SQLite Database Connected
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
